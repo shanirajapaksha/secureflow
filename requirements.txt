@@ -1,0 +1,18 @@
+# FastAPI & Web Framework
+fastapi==0.135.1
+uvicorn[standard]==0.42.0
+python-multipart==0.0.22
+
+# Data Processing & ML
+pandas==3.0.1
+numpy==2.4.3
+scikit-learn==1.8.0
+scipy==1.17.1
+
+# Model Serialization
+joblib==1.5.3
+
+# Utilities
+python-dotenv==1.0.1
+pydantic==2.12.5
+psycopg[binary]==3.2.10

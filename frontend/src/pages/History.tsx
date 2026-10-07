@@ -1,0 +1,5 @@
+import { useEffect, useState } from "react";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { PredictionRow, getHistoryAlerts, getHistorySessions, HistorySession } from "@/lib/api";
+import { ThreatAlertsTable } from "@/components/dashboard/ThreatAlertsTable";
+export default function History() { const [sessions, setSessions] = useState<HistorySession[]>([]); const [alerts, setAlerts] = useState<PredictionRow[]>([]); useEffect(() => { getHistorySessions().then(setSessions).catch(() => setSessions([])); }, []); return <DashboardLayout><div className="p-8"><h1 className="mb-6 text-3xl font-bold">Analysis History</h1><div className="grid gap-3 md:grid-cols-3">{sessions.map(s => <button className="rounded border bg-card p-4 text-left" key={s.id} onClick={() => getHistoryAlerts(s.id).then(setAlerts)}><b>{s.filename}</b><p className="text-sm text-muted-foreground">{s.timestamp}</p><p className="text-sm">{s.alert_count} intrusion alerts</p></button>)}</div><div className="mt-8 rounded border bg-card p-5"><ThreatAlertsTable predictions={alerts} /></div></div></DashboardLayout>; }

@@ -1,0 +1,10 @@
+-r requirements-test.txt
+
+# Notebook and model-development dependencies
+imbalanced-learn==0.14.1
+jupyter==1.1.1
+ipython==9.5.0
+ipykernel==6.30.1
+matplotlib==3.10.7
+seaborn==0.13.2
+plotly==6.3.0
