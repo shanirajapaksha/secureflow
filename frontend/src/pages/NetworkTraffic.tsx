@@ -3,7 +3,7 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { NetworkTrafficChart } from "@/components/dashboard/NetworkTrafficChart";
 import { AttackTypesChart } from "@/components/dashboard/AttackTypesChart";
 import { ThreatAlertsTable } from "@/components/dashboard/ThreatAlertsTable";
-import { GeographicMap } from "@/components/dashboard/GeographicMap";
+import { SourceIpOverview } from "@/components/dashboard/SourceIpOverview";
 import { Shield, AlertTriangle, Activity, ScanSearch, BrainCircuit } from "lucide-react";
 import { useDataContext } from "@/context/DataContext";
 import { getAttackTypeSummary, getSummaryCounts } from "@/lib/nids";
@@ -39,7 +39,7 @@ const NetworkTrafficPage = () => {
         </div>
 
         <div className="bg-card border border-border rounded-lg p-6 mb-8 animate-fade-in">
-          <GeographicMap />
+          <SourceIpOverview predictions={result?.predictions ?? []} />
         </div>
 
         <div className="bg-card border border-border rounded-lg p-6 animate-fade-in">

@@ -4,8 +4,8 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { NetworkTrafficChart } from "@/components/dashboard/NetworkTrafficChart";
 import { AttackTypesChart } from "@/components/dashboard/AttackTypesChart";
-import { ThreatAlertsTable } from "@/components/dashboard/ThreatAlertsTable";
-import { GeographicMap } from "@/components/dashboard/GeographicMap";
+import { AnalysisResultsTable } from "@/components/dashboard/AnalysisResultsTable";
+import { SourceIpOverview } from "@/components/dashboard/SourceIpOverview";
 import { Button } from "@/components/ui/button";
 import { uploadCsvForPrediction } from "@/lib/api";
 import { useDataContext } from "@/context/DataContext";
@@ -131,12 +131,13 @@ const Dashboard = () => {
         </div>
 
         <div className="bg-card border border-border rounded-lg p-6 mb-8 animate-fade-in" style={{ animationDelay: "400ms" }}>
-          <GeographicMap />
+          <SourceIpOverview predictions={result?.predictions ?? []} />
         </div>
 
         <div className="bg-card border border-border rounded-lg p-6 animate-fade-in" style={{ animationDelay: "500ms" }}>
-          <ThreatAlertsTable predictions={result?.predictions ?? []} />
+          <AnalysisResultsTable predictions={result?.predictions ?? []} />
         </div>
+
       </div>
     </DashboardLayout>
   );

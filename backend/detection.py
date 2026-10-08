@@ -126,7 +126,7 @@ class DetectionService:
         for index, (_, row) in enumerate(df.iterrows()):
             signature_status, signature_reason = signature_detection(row)
             if signature_status == "INTRUSION":
-                label = "Signature_Detected_Attack"
+                label = signature_attack_type(row)
                 status = "INTRUSION"
                 method = "Signature-Based"
                 reason = signature_reason
@@ -173,7 +173,7 @@ class DetectionService:
         }
 
 
-def signature_detection(row: pd.Series) -> tuple[str, str]:
+def _signature_matches(row: pd.Series) -> list[tuple[str, str]]:
     def value(column: str, default: float = 0) -> float:
         raw = row.get(column, default)
         try:
@@ -181,18 +181,30 @@ def signature_detection(row: pd.Series) -> tuple[str, str]:
         except (TypeError, ValueError):
             return default
 
-    alerts = []
+    alerts: list[tuple[str, str]] = []
     if value("Destination Port") in (80, 443) and value("Flow Packets/s") > 10_000:
-        alerts.append("Possible DoS/DDoS pattern detected")
+        alerts.append(("DDoS", "Possible DoS/DDoS pattern detected"))
     if value("SYN Flag Count") > 20:
-        alerts.append("Possible SYN flood detected")
+        alerts.append(("SYN Flood", "Possible SYN flood detected"))
     if value("Flow Duration") < 50_000 and value("Total Fwd Packets") < 5 and value("Total Backward Packets") < 5:
-        alerts.append("Possible port scanning activity")
+        alerts.append(("Port Scan", "Possible port scanning activity"))
     if value("Flow Bytes/s") > 1_000_000:
-        alerts.append("Suspiciously high byte rate")
+        alerts.append(("High Byte Rate", "Suspiciously high byte rate"))
     if value("Destination Port") == 21 and value("Flow Packets/s") > 500:
-        alerts.append("Possible FTP brute-force activity")
-    return ("INTRUSION", "; ".join(alerts)) if alerts else ("BENIGN", "No signature rule matched")
+        alerts.append(("FTP Brute Force", "Possible FTP brute-force activity"))
+    return alerts
+
+
+def signature_detection(row: pd.Series) -> tuple[str, str]:
+    """Return a backwards-compatible status and human-readable rule reasons."""
+    matches = _signature_matches(row)
+    return ("INTRUSION", "; ".join(reason for _label, reason in matches)) if matches else ("BENIGN", "No signature rule matched")
+
+
+def signature_attack_type(row: pd.Series) -> str:
+    """Use the primary matched signature as a chartable, analyst-friendly label."""
+    matches = _signature_matches(row)
+    return matches[0][0] if matches else "Signature Detected Attack"
 
 
 def get_source_ip(row: pd.Series) -> str:
@@ -210,9 +222,9 @@ def get_timestamp_value(row: pd.Series) -> str | None:
 
 
 def get_severity(label: str) -> str:
-    if any(value in str(label) for value in ("DDoS", "DoS", "Heartbleed", "Infiltration", "Bot")):
+    if any(value in str(label) for value in ("DDoS", "DoS", "SYN Flood", "Heartbleed", "Infiltration", "Bot")):
         return "High"
-    if any(value in str(label) for value in ("PortScan", "Web Attack", "Brute", "FTP", "Signature_Detected_Attack")):
+    if any(value in str(label) for value in ("PortScan", "Port Scan", "Web Attack", "Brute", "FTP")):
         return "Medium"
     return "Low" if str(label).upper() == "BENIGN" else "Review"
 
